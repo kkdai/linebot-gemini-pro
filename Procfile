@@ -1,2 +1,2 @@
-web: linebot-video
+web: linebot-gemini-pro
 
