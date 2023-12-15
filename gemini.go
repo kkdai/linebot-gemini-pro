@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 
@@ -31,9 +30,7 @@ func GeminiImage(imgData []byte) (string, error) {
 		return "", err
 	}
 
-	bs, _ := json.MarshalIndent(resp, "", "    ")
-	fmt.Println(string(bs))
-	return string(bs), nil
+	return printResponse(resp), nil
 }
 
 // Gemini Chat Complete: Iput a prompt and get the response string.
