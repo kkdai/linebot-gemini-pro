@@ -38,7 +38,9 @@ func main() {
 	geminiKey = os.Getenv("GOOGLE_GEMINI_API_KEY")
 
 	bot, err = linebot.New(os.Getenv("ChannelSecret"), os.Getenv("ChannelAccessToken"))
-	log.Println("Bot:", bot, " err:", err)
+	if err != nil {
+		log.Println("Bot:", bot, " err:", err)
+	}
 	http.HandleFunc("/callback", callbackHandler)
 	port := os.Getenv("PORT")
 	addr := fmt.Sprintf(":%s", port)
