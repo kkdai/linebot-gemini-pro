@@ -20,7 +20,7 @@ func GeminiImage(imgData []byte) string {
 
 	model := client.GenerativeModel("gemini-pro-vision")
 	prompt := []genai.Part{
-		genai.ImageData("jpg", imgData),
+		genai.ImageData("image/png", imgData),
 		genai.Text("Describe this image with scientific detail, reply in zh-TW:"),
 	}
 	resp, err := model.GenerateContent(ctx, prompt...)
