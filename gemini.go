@@ -75,8 +75,10 @@ func printResponse(resp *genai.GenerateContentResponse) string {
 	var ret string
 	for _, cand := range resp.Candidates {
 		for _, part := range cand.Content.Parts {
-			ret = ret + fmt.Sprintf("%x", part)
+			ret = ret + fmt.Sprintf("%v", part)
+			fmt.Println(part)
 		}
 	}
+	fmt.Println("---")
 	return ret + "\n---"
 }
