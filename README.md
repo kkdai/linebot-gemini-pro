@@ -50,10 +50,6 @@ LINE Bot template with Google Gemini Pro
 - 傳送影片訊息
 - 過一兩秒的判別時間，就會收到結果的 Flex Message
 
-### 成果
-
-![image-20220407212250046](http://www.evanlin.com/images/2021/image-20220407212250046.png)
-
 ### 完整開發教學
 
 [[學習文件] 如何透過 GCP STT (Speech To Text) 與 LINE Video Flex Message 來打造幫助長輩的影片翻譯（自動輸出文字）聊天機器人](https://www.evanlin.com/til-gcp-speech-video-flex/)
