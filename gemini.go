@@ -48,7 +48,7 @@ func GeminiImage() string {
 }
 
 // Gemini Chat Complete: Iput a prompt and get the response string.
-func GeminiChatComplete(prompt string) string {
+func GeminiChatComplete(req string) string {
 	ctx := context.Background()
 	client, err := genai.NewClient(ctx, option.WithAPIKey(geminiKey))
 	if err != nil {
