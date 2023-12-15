@@ -55,7 +55,7 @@ func GeminiChatComplete(req string) string {
 		log.Fatal(err)
 	}
 	defer client.Close()
-	model := client.GenerativeModel("gemini-pro-vision")
+	model := client.GenerativeModel("gemini-pro-chat")
 	prompt := []genai.Part{
 		genai.Text(req),
 	}
