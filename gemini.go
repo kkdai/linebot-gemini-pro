@@ -23,8 +23,9 @@ func GeminiImage(imgData []byte) string {
 		genai.ImageData("image/png", imgData),
 		genai.Text("Describe this image with scientific detail, reply in zh-TW:"),
 	}
+	log.Println("Begin processing image...")
 	resp, err := model.GenerateContent(ctx, prompt...)
-
+	log.Println("Finished processing image...", resp)
 	if err != nil {
 		log.Fatal(err)
 	}
