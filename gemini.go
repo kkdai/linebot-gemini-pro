@@ -65,6 +65,5 @@ func printResponse(resp *genai.GenerateContentResponse) string {
 			fmt.Println(part)
 		}
 	}
-	fmt.Println("---")
 	return ret
 }
