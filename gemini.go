@@ -10,7 +10,7 @@ import (
 	"google.golang.org/api/option"
 )
 
-func GeminiImage(imgData []byte) string {
+func GeminiImage(imgData []byte) (string, error) {
 	ctx := context.Background()
 	client, err := genai.NewClient(ctx, option.WithAPIKey(geminiKey))
 	if err != nil {
@@ -28,11 +28,12 @@ func GeminiImage(imgData []byte) string {
 	log.Println("Finished processing image...", resp)
 	if err != nil {
 		log.Fatal(err)
+		return "", err
 	}
 
 	bs, _ := json.MarshalIndent(resp, "", "    ")
 	fmt.Println(string(bs))
-	return string(bs)
+	return string(bs), nil
 }
 
 // Gemini Chat Complete: Iput a prompt and get the response string.

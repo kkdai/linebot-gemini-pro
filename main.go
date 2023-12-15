@@ -68,6 +68,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 
 				// Reply with Gemini result
 				ret := GeminiChatComplete(req)
+
 				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(ret)).Do(); err != nil {
 					log.Print(err)
 				}
@@ -97,7 +98,10 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				if err != nil {
 					log.Fatal(err)
 				}
-				ret := GeminiImage(data)
+				ret, err := GeminiImage(data)
+				if err != nil {
+					ret = "無法辨識影片內容文字，請重新輸入:" + err.Error()
+				}
 				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(ret)).Do(); err != nil {
 					log.Print(err)
 				}
