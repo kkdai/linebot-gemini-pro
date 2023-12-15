@@ -55,17 +55,28 @@ func GeminiChatComplete(req string) string {
 		log.Fatal(err)
 	}
 	defer client.Close()
-	model := client.GenerativeModel("gemini-pro-chat")
-	prompt := []genai.Part{
-		genai.Text(req),
+	model := client.GenerativeModel("gemini-pro")
+	cs := model.StartChat()
+
+	send := func(msg string) *genai.GenerateContentResponse {
+		fmt.Printf("== Me: %s\n== Model:\n", msg)
+		res, err := cs.SendMessage(ctx, genai.Text(msg))
+		if err != nil {
+			log.Fatal(err)
+		}
+		return res
 	}
 
-	resp, err := model.GenerateContent(ctx, prompt...)
-	if err != nil {
-		log.Fatal(err)
-	}
+	res := send(req)
+	return printResponse(res)
+}
 
-	bs, _ := json.MarshalIndent(resp, "", "    ")
-	fmt.Println(string(bs))
-	return string(bs)
+func printResponse(resp *genai.GenerateContentResponse) string {
+	var ret string
+	for _, cand := range resp.Candidates {
+		for _, part := range cand.Content.Parts {
+			ret = ret + fmt.Sprintf("%x", part)
+		}
+	}
+	return ret + "\n---"
 }
