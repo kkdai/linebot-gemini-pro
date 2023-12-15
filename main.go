@@ -15,6 +15,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -90,66 +91,13 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					log.Println("Got GetMessageContent err:", err)
 				}
 				defer content.Content.Close()
-
-				client, err := storage.NewClient(context.Background())
-				var ret string
+				data, err := io.ReadAll(content.Content)
 				if err != nil {
-					ret = "storage.NewClient: " + err.Error()
-				} else {
-					ret = "storage.NewClient: OK"
+					log.Fatal(err)
 				}
-
-				fileN := buildFileName() + ".jpg"
-				if content.ContentLength > 0 {
-					uploader := &ClientUploader{
-						cl:         client,
-						bucketName: bucketName,
-						projectID:  projectID,
-						uploadPath: "test-files/",
-					}
-
-					err = uploader.UploadImage(content.Content)
-					if err != nil {
-						ret = "uploader.UploadFile: " + err.Error()
-					} else {
-						ret = "uploader.UploadFile: OK" + " fileN: " + fileN
-					}
-
-					imgurl := uploader.GetPulicAddress()
-
-					if _, err = bot.ReplyMessage(event.ReplyToken,
-						linebot.NewTextMessage(ret),
-						linebot.NewFlexMessage("image",
-							&linebot.BubbleContainer{
-								Type: linebot.FlexContainerTypeBubble,
-								Hero: &linebot.ImageComponent{
-									Type: linebot.FlexComponentTypeVideo,
-									URL:  imgurl,
-								},
-								Body: &linebot.BoxComponent{
-									Type:   linebot.FlexComponentTypeBox,
-									Layout: linebot.FlexBoxLayoutTypeVertical,
-									Contents: []linebot.FlexComponent{
-										&linebot.TextComponent{
-											Type: linebot.FlexComponentTypeText,
-											Text: "hello",
-										},
-									},
-								},
-							})).Do(); err != nil {
-						log.Print(err)
-					}
-
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(ret), linebot.NewImageMessage(imgurl, imgurl)).Do(); err != nil {
-						log.Print(err)
-					}
-				} else {
-					log.Println("Empty img")
-					ret = "Empty img"
-
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(ret)).Do(); err != nil {
-						log.Print(err)
-					}
+				ret := GeminiImage(data)
+				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(ret)).Do(); err != nil {
+					log.Print(err)
 				}
 
 			// Handle only video message

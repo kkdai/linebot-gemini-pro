@@ -5,13 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/google/generative-ai-go/genai"
 	"google.golang.org/api/option"
 )
 
-func GeminiImage() string {
+func GeminiImage(imgData []byte) string {
 	ctx := context.Background()
 	client, err := genai.NewClient(ctx, option.WithAPIKey(geminiKey))
 	if err != nil {
@@ -20,21 +19,9 @@ func GeminiImage() string {
 	defer client.Close()
 
 	model := client.GenerativeModel("gemini-pro-vision")
-
-	imgData1, err := os.ReadFile("../images/turtle1.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	imgData2, err := os.ReadFile("../images/turtle2.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	prompt := []genai.Part{
-		genai.ImageData("png", imgData1),
-		genai.ImageData("png", imgData2),
-		genai.Text("Describe the difference between these two pictures, with scientific detail"),
+		genai.ImageData("jpg", imgData),
+		genai.Text("Describe this image with scientific detail, reply in zh-TW:"),
 	}
 	resp, err := model.GenerateContent(ctx, prompt...)
 
