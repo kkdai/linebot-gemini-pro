@@ -3,6 +3,10 @@ LINE Bot template with Google Gemini Pro
 
  [![GoDoc](https://godoc.org/github.com/kkdai/linebot-gemini-pro.svg?status.svg)](https://godoc.org/github.com/kkdai/LineBotTemplate)   ![Go](https://github.com/kkdai/linebot-gemini-pro/workflows/Go/badge.svg) [![goreportcard.com](https://goreportcard.com/badge/github.com/kkdai/linebot-gemini-pro)](https://goreportcard.com/report/github.com/kkdai/linebot-gemini-pro)
 
+![image-20231216023250102](img/image-20231216023250102.png)
+
+
+
 ## 如何快速架設在自己平台
 
 請根據以下的流程，來直接透過開源的程式碼來架設一個 LINEBot 跟 GCP  STT 與 GCS (Google Cloud Storage) 的結合。
@@ -52,7 +56,7 @@ LINE Bot template with Google Gemini Pro
 
 ### 完整開發教學
 
-[[學習文件] 如何透過 GCP STT (Speech To Text) 與 LINE Video Flex Message 來打造幫助長輩的影片翻譯（自動輸出文字）聊天機器人](https://www.evanlin.com/til-gcp-speech-video-flex/)
+- [[Golang\] 透過 Google Gemini Pro 來打造一個基本功能 LLM LINE Bot](https://www.evanlin.com/til-gogle-gemini-pro-linebot/)
 
 License
 ---------------
