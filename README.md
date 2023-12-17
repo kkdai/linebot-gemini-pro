@@ -51,7 +51,9 @@ LINE Bot template with Google Gemini Pro
 ### 如何使用
 
 - 打開聊天機器人
-- 傳送影片訊息
+  - **直接打字：** 透過文字直接跟 Gemini Pro 溝通。
+  - z
+
 - 過一兩秒的判別時間，就會收到結果的 Flex Message
 
 ### 完整開發教學

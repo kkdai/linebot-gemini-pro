@@ -18,6 +18,7 @@ func GeminiImage(imgData []byte) (string, error) {
 	defer client.Close()
 
 	model := client.GenerativeModel("gemini-pro-vision")
+	model.Temperature = 0.8
 	prompt := []genai.Part{
 		genai.ImageData("png", imgData),
 		genai.Text("Describe this image with scientific detail, reply in zh-TW:"),
@@ -42,6 +43,7 @@ func GeminiChatComplete(req string) string {
 	}
 	defer client.Close()
 	model := client.GenerativeModel("gemini-pro")
+	model.Temperature = 0.3
 	cs := model.StartChat()
 
 	send := func(msg string) *genai.GenerateContentResponse {
