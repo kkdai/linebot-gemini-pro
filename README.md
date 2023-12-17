@@ -5,8 +5,6 @@ LINE Bot template with Google Gemini Pro
 
 ![image-20231216023250102](img/image-20231216023250102.png)
 
-
-
 ## 如何快速架設在自己平台
 
 請根據以下的流程，來直接透過開源的程式碼來架設一個 LINEBot 跟 GCP  STT 與 GCS (Google Cloud Storage) 的結合。
@@ -34,6 +32,7 @@ LINE Bot template with Google Gemini Pro
    4. **GCS_PROJECT_ID**: Google Cloud Storage Project ID
    5. **GOOGLE_APPLICATION_CREDENTIALS**: 這是必須要填寫，請勿修改。
    6. **GOOGLE_CREDENTIALS**: 這邊請將 GCP JSON key file 的內容（對～就是整包檔案裡面的 JSON 資料），全部放上去。這樣是比較安全的。
+   7. **GOOGLE_GEMINI_API_KEY**: 必需要透過 [Google Gemini API Keys](https://makersuite.google.com/app/apikey) 來取得。
 4. 請到 LINE 官方帳號的平台，到了右上角的「設定」中，選擇「帳號設定」
    1. 將你官方帳號基本資料設定好，並且打開加入群組功能。
       1. ![image-20220421103018014](http://www.evanlin.com/images/2021/image-20220421103018014.png)
@@ -51,10 +50,8 @@ LINE Bot template with Google Gemini Pro
 ### 如何使用
 
 - 打開聊天機器人
-  - **直接打字：** 透過文字直接跟 Gemini Pro 溝通。
-  - z
-
-- 過一兩秒的判別時間，就會收到結果的 Flex Message
+  - **直接打字：** 透過文字直接跟 Gemini Pro 溝通 (透過 Gemini Pro Chat)。
+  - **傳送圖片：** 直接辨識圖片內容，目前的想法是透過比較科學化的角度來說明。
 
 ### 完整開發教學
 
