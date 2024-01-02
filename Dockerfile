@@ -1,5 +1,5 @@
 # 使用官方 Golang 鏡像作為基礎鏡像
-FROM golang:latest
+FROM golang:1.21.5
 
 # 在容器內設置工作目錄
 WORKDIR /app

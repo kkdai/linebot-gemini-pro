@@ -1,0 +1,21 @@
+services:
+  linebot-gemini-conversation:
+    command:
+      - "/app/main"
+    container_name: "linebot-gemini-conversation"
+    environment:
+      - "ChannelAccessToken=X"
+      - "ChannelSecret=X"
+      - "GCS_BUCKET_NAME=X"
+      - "GCS_PROJECT_ID=X"
+      - "GOOGLE_APPLICATION_CREDENTIALS=google-credentials.json"
+      - "GOOGLE_CREDENTIALS=X"
+      - "GOOGLE_GEMINI_API_KEY=X"
+      - "PORT=3002"
+    image: "gemini-chat:0102-2"
+    network_mode: "bridge"
+    ports:
+      - "172.17.0.1:3002:3002"
+    restart: "always"
+    working_dir: "/app"
+version: "3.6"
