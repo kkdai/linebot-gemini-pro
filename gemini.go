@@ -34,30 +34,47 @@ func GeminiImage(imgData []byte) (string, error) {
 	return printResponse(resp), nil
 }
 
-// Gemini Chat Complete: Iput a prompt and get the response string.
-func GeminiChatComplete(req string) string {
-	ctx := context.Background()
-	client, err := genai.NewClient(ctx, option.WithAPIKey(geminiKey))
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer client.Close()
-	model := client.GenerativeModel("gemini-pro")
-	model.Temperature = 0.3
+func startNewChatSession() *genai.ChatSession {
+    ctx := context.Background()
+    client, err := genai.NewClient(ctx, option.WithAPIKey(geminiKey))
+    if err != nil {
+        log.Fatal(err)
+    }
+    model := client.GenerativeModel("gemini-pro")
+    model.Temperature = 0.3
 	cs := model.StartChat()
-
-	send := func(msg string) *genai.GenerateContentResponse {
-		fmt.Printf("== Me: %s\n== Model:\n", msg)
-		res, err := cs.SendMessage(ctx, genai.Text(msg))
-		if err != nil {
-			log.Fatal(err)
-		}
-		return res
-	}
-
-	res := send(req)
-	return printResponse(res)
+    // init prompt
+	// cs.History = []*genai.Content{
+	// 	&genai.Content{
+	// 	Parts: []genai.Part{
+	// 		genai.Text("請你扮演專業的傾聽者來回答問題。並適時的給出建議。"),
+	// 	},
+	// 	Role: "user",
+	// 	},
+	// 	&genai.Content{
+	// 	Parts: []genai.Part{
+	// 		genai.Text("好的，我會盡力的。"),
+	// 	},
+	// 	Role: "model",
+	// 	},
+	// }
+	return cs
 }
+
+func send(cs *genai.ChatSession, msg string) *genai.GenerateContentResponse {
+    if cs == nil {
+        cs = startNewChatSession()
+    }
+
+    ctx := context.Background()
+    fmt.Printf("== Me: %s\n== Model:\n", msg)
+    res, err := cs.SendMessage(ctx, genai.Text(msg))
+    if err != nil {
+        log.Fatal(err)
+    }
+    return res
+}
+
 
 func printResponse(resp *genai.GenerateContentResponse) string {
 	var ret string
@@ -69,3 +86,4 @@ func printResponse(resp *genai.GenerateContentResponse) string {
 	}
 	return ret
 }
+
