@@ -1,4 +1,4 @@
-name: My Deploy
+name: Render Deploy
 
 on:
   release:
