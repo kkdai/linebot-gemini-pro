@@ -39,31 +39,33 @@ func GeminiImage(imgData []byte) (string, error) {
 	return printResponse(resp), nil
 }
 
+// startNewChatSession	: Start a new chat session
 func startNewChatSession() *genai.ChatSession {
-    ctx := context.Background()
-    client, err := genai.NewClient(ctx, option.WithAPIKey(geminiKey))
-    if err != nil {
-        log.Fatal(err)
-    }
-    model := client.GenerativeModel("gemini-pro")
-	  value := float32(ChatTemperture)
-	  model.Temperature = &value    
-  	cs := model.StartChat()
-	  return cs
+	ctx := context.Background()
+	client, err := genai.NewClient(ctx, option.WithAPIKey(geminiKey))
+	if err != nil {
+		log.Fatal(err)
+	}
+	model := client.GenerativeModel("gemini-pro")
+	value := float32(ChatTemperture)
+	model.Temperature = &value
+	cs := model.StartChat()
+	return cs
 }
 
+// send: Send a message to the chat session
 func send(cs *genai.ChatSession, msg string) *genai.GenerateContentResponse {
-    if cs == nil {
-        cs = startNewChatSession()
-    }
+	if cs == nil {
+		cs = startNewChatSession()
+	}
 
-    ctx := context.Background()
-    fmt.Printf("== Me: %s\n== Model:\n", msg)
-    res, err := cs.SendMessage(ctx, genai.Text(msg))
-    if err != nil {
-        log.Fatal(err)
-    }
-    return res
+	ctx := context.Background()
+	log.Printf("== Me: %s\n== Model:\n", msg)
+	res, err := cs.SendMessage(ctx, genai.Text(msg))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return res
 }
 
 // Print response
@@ -72,7 +74,7 @@ func printResponse(resp *genai.GenerateContentResponse) string {
 	for _, cand := range resp.Candidates {
 		for _, part := range cand.Content.Parts {
 			ret = ret + fmt.Sprintf("%v", part)
-			fmt.Println(part)
+			log.Println(part)
 		}
 	}
 	return ret

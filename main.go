@@ -19,8 +19,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/line/line-bot-sdk-go/v7/linebot"
 	"github.com/google/generative-ai-go/genai"
+	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
 
 var bot *linebot.Client
@@ -68,7 +68,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					cs = startNewChatSession()
 					userSessions[event.Source.UserID] = cs
 				}
-				if req == "reset"{
+				if req == "reset" {
 					// 如果需要重置記憶，創建一個新的 ChatSession
 					cs = startNewChatSession()
 					userSessions[event.Source.UserID] = cs
@@ -111,7 +111,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				}
 				ret, err := GeminiImage(data)
 				if err != nil {
-					ret = "無法辨識影片內容文字，請重新輸入:" + err.Error()
+					ret = "無法辨識圖片內容，請重新輸入:" + err.Error()
 				}
 				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(ret)).Do(); err != nil {
 					log.Print(err)
