@@ -21,18 +21,18 @@ LINE Bot template with Google Gemini Pro
 ### 開始部署
 
 1. 請先到程式碼:  [https://github.com/kkdai/linebot-gemini-pro]( https://github.com/kkdai/linebot-gemini-pro)
-2. 按下： [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)  來部署到你的 Heroku 帳號
+
+2. 部署到雲服務平台 (兩個擇一即可）：
+
+   2.1.  按下： [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)  來部署到你的 Heroku 帳號
+
+   2.12  按下： [![Deploy to Render](http://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+ 來部署到你的 Render 帳號
 
 3. 除了填寫 App Name 以外，以下的參數必須要填入才能完整運行。
-   ![image-20220421101405675](http://www.evanlin.com/images/2021/image-20220421101405675.png)
-
    1. **ChannelAccessToken**: 請到 LINE Developers Console issue 一個。
    2. **ChannelSecret**: 請到 LINE Developers Console 拿一個。
-   3. **GCS_BUCKET_NAME**: Google Cloud Storage Bucket Name 你需要先建立一個 GCS bucket 並且依照稍後文章的內容來改成 public access 。
-   4. **GCS_PROJECT_ID**: Google Cloud Storage Project ID
-   5. **GOOGLE_APPLICATION_CREDENTIALS**: 這是必須要填寫，請勿修改。
-   6. **GOOGLE_CREDENTIALS**: 這邊請將 GCP JSON key file 的內容（對～就是整包檔案裡面的 JSON 資料），全部放上去。這樣是比較安全的。
-   7. **GOOGLE_GEMINI_API_KEY**: 必需要透過 [Google Gemini API Keys](https://makersuite.google.com/app/apikey) 來取得。
+   3. **GOOGLE_GEMINI_API_KEY**: 必需要透過 [Google Gemini API Keys](https://makersuite.google.com/app/apikey) 來取得。
 4. 請到 LINE 官方帳號的平台，到了右上角的「設定」中，選擇「帳號設定」
    1. 將你官方帳號基本資料設定好，並且打開加入群組功能。
       1. ![image-20220421103018014](http://www.evanlin.com/images/2021/image-20220421103018014.png)
