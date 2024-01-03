@@ -27,25 +27,8 @@
       "description": "LINE OA Channel Secret",
       "required": true
     },
-    "GCS_PROJECT_ID": {
-      "description": "Google Cloud Storage Project ID",
-      "required": true
-    },
-    "GCS_BUCKET_NAME": {
-      "description": "Google Cloud Storage Bucket Name",
-      "required": true
-    },
     "GOOGLE_GEMINI_API_KEY": {
       "description": "Get from https://makersuite.google.com/app/apikey",
-      "required": true
-    },
-    "GOOGLE_APPLICATION_CREDENTIALS": {
-      "description": "It is the fix env for GCP SDK (DO NOT CHANGE IT)",
-      "required": true,
-      "value": "google-credentials.json"
-    },
-    "GOOGLE_CREDENTIALS": {
-      "description": "Google credentials json content here.",
       "required": true
     }
   }
