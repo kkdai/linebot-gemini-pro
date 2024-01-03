@@ -24,16 +24,11 @@ import (
 
 var bot *linebot.Client
 
-var projectID string
-var bucketName string
 var geminiKey string
 
 func main() {
 	var err error
-	projectID = os.Getenv("GCS_PROJECT_ID")
-	bucketName = os.Getenv("GCS_BUCKET_NAME")
 	geminiKey = os.Getenv("GOOGLE_GEMINI_API_KEY")
-
 	bot, err = linebot.New(os.Getenv("ChannelSecret"), os.Getenv("ChannelAccessToken"))
 	if err != nil {
 		log.Println("Bot:", bot, " err:", err)
