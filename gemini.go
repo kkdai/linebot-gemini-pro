@@ -9,6 +9,10 @@ import (
 	"google.golang.org/api/option"
 )
 
+const ImageTemperture = 0.8
+const ChatTemperture = 0.3
+
+// Gemini Image: Input an image and get the response string.
 func GeminiImage(imgData []byte) (string, error) {
 	ctx := context.Background()
 	client, err := genai.NewClient(ctx, option.WithAPIKey(geminiKey))
@@ -18,7 +22,8 @@ func GeminiImage(imgData []byte) (string, error) {
 	defer client.Close()
 
 	model := client.GenerativeModel("gemini-pro-vision")
-	model.Temperature = 0.8
+	value := float32(ImageTemperture)
+	model.Temperature = &value
 	prompt := []genai.Part{
 		genai.ImageData("png", imgData),
 		genai.Text("Describe this image with scientific detail, reply in zh-TW:"),
@@ -43,7 +48,8 @@ func GeminiChatComplete(req string) string {
 	}
 	defer client.Close()
 	model := client.GenerativeModel("gemini-pro")
-	model.Temperature = 0.3
+	value := float32(ChatTemperture)
+	model.Temperature = &value
 	cs := model.StartChat()
 
 	send := func(msg string) *genai.GenerateContentResponse {
@@ -59,6 +65,7 @@ func GeminiChatComplete(req string) string {
 	return printResponse(res)
 }
 
+// Print response
 func printResponse(resp *genai.GenerateContentResponse) string {
 	var ret string
 	for _, cand := range resp.Candidates {
