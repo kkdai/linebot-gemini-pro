@@ -39,30 +39,31 @@ func GeminiImage(imgData []byte) (string, error) {
 	return printResponse(resp), nil
 }
 
-// Gemini Chat Complete: Iput a prompt and get the response string.
-func GeminiChatComplete(req string) string {
-	ctx := context.Background()
-	client, err := genai.NewClient(ctx, option.WithAPIKey(geminiKey))
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer client.Close()
-	model := client.GenerativeModel("gemini-pro")
-	value := float32(ChatTemperture)
-	model.Temperature = &value
-	cs := model.StartChat()
+func startNewChatSession() *genai.ChatSession {
+    ctx := context.Background()
+    client, err := genai.NewClient(ctx, option.WithAPIKey(geminiKey))
+    if err != nil {
+        log.Fatal(err)
+    }
+    model := client.GenerativeModel("gemini-pro")
+	  value := float32(ChatTemperture)
+	  model.Temperature = &value    
+  	cs := model.StartChat()
+	  return cs
+}
 
-	send := func(msg string) *genai.GenerateContentResponse {
-		fmt.Printf("== Me: %s\n== Model:\n", msg)
-		res, err := cs.SendMessage(ctx, genai.Text(msg))
-		if err != nil {
-			log.Fatal(err)
-		}
-		return res
-	}
+func send(cs *genai.ChatSession, msg string) *genai.GenerateContentResponse {
+    if cs == nil {
+        cs = startNewChatSession()
+    }
 
-	res := send(req)
-	return printResponse(res)
+    ctx := context.Background()
+    fmt.Printf("== Me: %s\n== Model:\n", msg)
+    res, err := cs.SendMessage(ctx, genai.Text(msg))
+    if err != nil {
+        log.Fatal(err)
+    }
+    return res
 }
 
 // Print response

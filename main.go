@@ -20,11 +20,15 @@ import (
 	"os"
 
 	"github.com/line/line-bot-sdk-go/v7/linebot"
+	"github.com/google/generative-ai-go/genai"
 )
 
 var bot *linebot.Client
 
 var geminiKey string
+
+// 建立一個 map 來儲存每個用戶的 ChatSession
+var userSessions = make(map[string]*genai.ChatSession)
 
 func main() {
 	var err error
@@ -57,10 +61,25 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			// Handle only on text message
 			case *linebot.TextMessage:
 				req := message.Text
-
-				// Reply with Gemini result
-				ret := GeminiChatComplete(req)
-
+				// 檢查是否已經有這個用戶的 ChatSession or req == "reset"
+				cs, ok := userSessions[event.Source.UserID]
+				if !ok {
+					// 如果沒有，則創建一個新的 ChatSession
+					cs = startNewChatSession()
+					userSessions[event.Source.UserID] = cs
+				}
+				if req == "reset"{
+					// 如果需要重置記憶，創建一個新的 ChatSession
+					cs = startNewChatSession()
+					userSessions[event.Source.UserID] = cs
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("很高興初次見到你，請問有什麼想了解的嗎？")).Do(); err != nil {
+						log.Print(err)
+					}
+					continue
+				}
+				// 使用這個 ChatSession 來處理訊息 & Reply with Gemini result
+				res := send(cs, req)
+				ret := printResponse(res)
 				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(ret)).Do(); err != nil {
 					log.Print(err)
 				}
