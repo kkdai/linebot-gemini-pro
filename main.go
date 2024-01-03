@@ -20,12 +20,15 @@ import (
 	"os"
 
 	"github.com/google/generative-ai-go/genai"
-	"github.com/line/line-bot-sdk-go/v7/linebot"
+	"github.com/line/line-bot-sdk-go/v8/linebot"
+	"github.com/line/line-bot-sdk-go/v8/linebot/messaging_api"
+	"github.com/line/line-bot-sdk-go/v8/linebot/webhook"
 )
 
-var bot *linebot.Client
-
+var bot *messaging_api.MessagingApiAPI
+var blob *messaging_api.MessagingApiBlobAPI
 var geminiKey string
+var channelToken string
 
 // 建立一個 map 來儲存每個用戶的 ChatSession
 var userSessions = make(map[string]*genai.ChatSession)
@@ -33,19 +36,41 @@ var userSessions = make(map[string]*genai.ChatSession)
 func main() {
 	var err error
 	geminiKey = os.Getenv("GOOGLE_GEMINI_API_KEY")
-	bot, err = linebot.New(os.Getenv("ChannelSecret"), os.Getenv("ChannelAccessToken"))
+	channelToken = os.Getenv("ChannelAccessToken")
+	bot, err = messaging_api.NewMessagingApiAPI(channelToken)
 	if err != nil {
-		log.Println("Bot:", bot, " err:", err)
+		log.Fatal(err)
 	}
+
+	blob, err = messaging_api.NewMessagingApiBlobAPI(channelToken)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	http.HandleFunc("/callback", callbackHandler)
 	port := os.Getenv("PORT")
 	addr := fmt.Sprintf(":%s", port)
 	http.ListenAndServe(addr, nil)
 }
 
-func callbackHandler(w http.ResponseWriter, r *http.Request) {
-	events, err := bot.ParseRequest(r)
+func replyText(replyToken, text string) error {
+	if _, err := bot.ReplyMessage(
+		&messaging_api.ReplyMessageRequest{
+			ReplyToken: replyToken,
+			Messages: []messaging_api.MessageInterface{
+				&messaging_api.TextMessage{
+					Text: text,
+				},
+			},
+		},
+	); err != nil {
+		return err
+	}
+	return nil
+}
 
+func callbackHandler(w http.ResponseWriter, r *http.Request) {
+	cb, err := webhook.ParseRequest(os.Getenv("ChannelSecret"), r)
 	if err != nil {
 		if err == linebot.ErrInvalidSignature {
 			w.WriteHeader(400)
@@ -55,24 +80,39 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, event := range events {
-		if event.Type == linebot.EventTypeMessage {
-			switch message := event.Message.(type) {
+	for _, event := range cb.Events {
+		log.Printf("Got event %v", event)
+		switch e := event.(type) {
+		case webhook.MessageEvent:
+			switch message := e.Message.(type) {
 			// Handle only on text message
-			case *linebot.TextMessage:
+			case webhook.TextMessageContent:
 				req := message.Text
 				// 檢查是否已經有這個用戶的 ChatSession or req == "reset"
-				cs, ok := userSessions[event.Source.UserID]
+
+				// 取得用戶 ID
+				var uID string
+				switch source := e.Source.(type) {
+				case *webhook.UserSource:
+					uID = source.UserId
+				case *webhook.GroupSource:
+					uID = source.UserId
+				case *webhook.RoomSource:
+					uID = source.UserId
+				}
+
+				// 檢查是否已經有這個用戶的 ChatSession
+				cs, ok := userSessions[uID]
 				if !ok {
 					// 如果沒有，則創建一個新的 ChatSession
 					cs = startNewChatSession()
-					userSessions[event.Source.UserID] = cs
+					userSessions[uID] = cs
 				}
 				if req == "reset" {
 					// 如果需要重置記憶，創建一個新的 ChatSession
 					cs = startNewChatSession()
-					userSessions[event.Source.UserID] = cs
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("很高興初次見到你，請問有什麼想了解的嗎？")).Do(); err != nil {
+					userSessions[uID] = cs
+					if err := replyText(e.ReplyToken, "很高興初次見到你，請問有什麼想了解的嗎？"); err != nil {
 						log.Print(err)
 					}
 					continue
@@ -80,32 +120,32 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				// 使用這個 ChatSession 來處理訊息 & Reply with Gemini result
 				res := send(cs, req)
 				ret := printResponse(res)
-				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(ret)).Do(); err != nil {
+				if err := replyText(e.ReplyToken, ret); err != nil {
 					log.Print(err)
 				}
 			// Handle only on Sticker message
-			case *linebot.StickerMessage:
+			case webhook.StickerMessageContent:
 				var kw string
 				for _, k := range message.Keywords {
 					kw = kw + "," + k
 				}
 
-				outStickerResult := fmt.Sprintf("收到貼圖訊息: %s, pkg: %s kw: %s  text: %s", message.StickerID, message.PackageID, kw, message.Text)
-				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(outStickerResult)).Do(); err != nil {
+				outStickerResult := fmt.Sprintf("收到貼圖訊息: %s, pkg: %s kw: %s  text: %s", message.StickerId, message.PackageId, kw, message.Text)
+				if err := replyText(e.ReplyToken, outStickerResult); err != nil {
 					log.Print(err)
 				}
 
 			// Handle only image message
-			case *linebot.ImageMessage:
-				log.Println("Got img msg ID:", message.ID)
+			case webhook.ImageMessageContent:
+				log.Println("Got img msg ID:", message.Id)
 
 				//Get image binary from LINE server based on message ID.
-				content, err := bot.GetMessageContent(message.ID).Do()
+				content, err := blob.GetMessageContent(message.Id)
 				if err != nil {
 					log.Println("Got GetMessageContent err:", err)
 				}
-				defer content.Content.Close()
-				data, err := io.ReadAll(content.Content)
+				defer content.Body.Close()
+				data, err := io.ReadAll(content.Body)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -113,14 +153,24 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				if err != nil {
 					ret = "無法辨識圖片內容，請重新輸入:" + err.Error()
 				}
-				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(ret)).Do(); err != nil {
+				if err := replyText(e.ReplyToken, ret); err != nil {
 					log.Print(err)
 				}
 
 			// Handle only video message
-			case *linebot.VideoMessage:
-				log.Println("Got video msg ID:", message.ID)
+			case webhook.VideoMessageContent:
+				log.Println("Got video msg ID:", message.Id)
+
+			default:
+				log.Printf("Unknown message: %v", message)
 			}
+		case webhook.FollowEvent:
+			log.Printf("message: Got followed event")
+		case webhook.PostbackEvent:
+			data := e.Postback.Data
+			log.Printf("Unknown message: Got postback: " + data)
+		case webhook.BeaconEvent:
+			log.Printf("Got beacon: " + e.Beacon.Hwid)
 		}
 	}
 }
