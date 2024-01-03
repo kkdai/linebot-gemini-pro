@@ -43,21 +43,6 @@ func startNewChatSession() *genai.ChatSession {
     model := client.GenerativeModel("gemini-pro")
     model.Temperature = 0.3
 	cs := model.StartChat()
-    // init prompt
-	// cs.History = []*genai.Content{
-	// 	&genai.Content{
-	// 	Parts: []genai.Part{
-	// 		genai.Text("請你扮演專業的傾聽者來回答問題。並適時的給出建議。"),
-	// 	},
-	// 	Role: "user",
-	// 	},
-	// 	&genai.Content{
-	// 	Parts: []genai.Part{
-	// 		genai.Text("好的，我會盡力的。"),
-	// 	},
-	// 	Role: "model",
-	// 	},
-	// }
 	return cs
 }
 
